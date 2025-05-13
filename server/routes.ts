@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
 import { extractTextFromImage, extractTextFromTextFile, isImage, isTextFile } from "./lib/ocr";
-import { translateText, isTranslationApiConfigured } from "./lib/translate";
+import { translateText, isTranslationApiConfigured, generateSpeechMarkup } from "./lib/translate";
 import { summarizeText, isSummarizationApiConfigured } from "./lib/summarize";
 import { LanguageCode, insertDocumentSchema, processDocumentSchema } from "@shared/schema";
 import { z } from "zod";
@@ -97,15 +97,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       if (!translation) {
+        // Get translated text with the new api
         const translatedText = await translateText(
           document.originalText,
           processRequest.targetLanguage as LanguageCode
         );
         
+        // Generate speech markup for text-to-speech functionality
+        const speechMarkup = generateSpeechMarkup(
+          translatedText,
+          processRequest.targetLanguage as LanguageCode
+        );
+        
+        // Combine translated text with speech functionality
+        const translatedTextWithSpeech = translatedText + speechMarkup;
+        
         translation = await storage.createTranslation({
           documentId,
           language: processRequest.targetLanguage,
-          translatedText,
+          translatedText: translatedTextWithSpeech,
         });
       }
 
