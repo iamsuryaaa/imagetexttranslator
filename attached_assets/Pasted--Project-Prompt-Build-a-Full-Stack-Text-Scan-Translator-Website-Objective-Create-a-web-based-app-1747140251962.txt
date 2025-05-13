@@ -1,0 +1,121 @@
+🔧 Project Prompt: Build a Full-Stack Text Scan Translator Website
+Objective:
+Create a web-based application where users can upload an image (with text) or a text file. The app will:
+
+Extract text from the uploaded file using OCR (if image).
+
+Translate the extracted text into one or more Indian regional languages (e.g., Hindi, Tamil, Bengali, etc.).
+
+Summarize the translated (or original) text.
+
+Store the original, translated, and summarized text into a cloud database.
+
+Display results on the frontend.
+
+Be deployable and production-ready.
+
+✅ Core Features
+User Upload Interface
+
+Accept image files (JPEG/PNG) or text files (.txt, .docx, PDF).
+
+Validate and preview files before processing.
+
+Text Extraction
+
+Use Tesseract OCR or Google Vision API for extracting text from images.
+
+Use appropriate libraries for text file parsing (like python-docx, PyMuPDF, or plain file I/O).
+
+Translation
+
+Use Google Translate API, IndicTrans, or AI4Bharat APIs for translating to Indian languages such as:
+
+Hindi
+
+Bengali
+
+Tamil
+
+Telugu
+
+Marathi
+
+Kannada
+
+Gujarati
+
+Summarization
+
+Use an NLP library or API such as HuggingFace Transformers (e.g., bart-large-cnn or t5) or OpenAI GPT API to summarize the extracted or translated text.
+
+Cloud Database Integration
+
+Store:
+
+User file metadata
+
+Original text
+
+Translated text (per language)
+
+Summary
+
+Use Firebase Firestore, MongoDB Atlas, or Google Cloud Firestore.
+
+Frontend (UI/UX)
+
+Built with React, Vue, or Next.js.
+
+Sections for:
+
+File upload
+
+Processing status
+
+Display original, translated, and summarized text
+
+Option to download or copy results.
+
+Backend
+
+Python Flask / Django / FastAPI app
+
+Handle file upload, OCR, translation, summarization, and DB storage.
+
+Deployment
+
+Host on Vercel, Render, Heroku, or AWS EC2.
+
+Use Docker for containerization (optional but ideal for scaling).
+
+🚀 Bonus Features (Optional but Valuable)
+User login/signup with Firebase Auth or OAuth
+
+Multi-language UI
+
+Download summarized or translated content as PDF
+
+Logging & error tracking via Sentry or LogRocket
+
+🛠️ Tech Stack Recommendations
+Layer	Tech Suggestions
+Frontend	React / Next.js / Vue
+Backend	FastAPI / Flask / Django
+OCR	pytesseract / Google Vision API
+Translation	Google Translate API / AI4Bharat / IndicTrans
+Summarization	HuggingFace Transformers / OpenAI GPT
+Database	Firebase Firestore / MongoDB Atlas
+Hosting	Vercel / Render / AWS / Heroku
+
+📦 Deliverables
+Fully functional web app
+
+Clean UI/UX
+
+Deployed and hosted project link
+
+Source code (GitHub)
+
+ReadMe with setup instructions
+
