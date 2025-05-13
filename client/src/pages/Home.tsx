@@ -34,7 +34,7 @@ export default function Home() {
         toast({
           title: "Translation API not configured",
           description: "Translation functionality will be limited without an API key",
-          variant: "warning",
+          variant: "destructive",
         });
       }
       
@@ -42,7 +42,7 @@ export default function Home() {
         toast({
           title: "Summarization API not configured",
           description: "Summarization functionality will be limited without an API key",
-          variant: "warning",
+          variant: "destructive",
         });
       }
     }
@@ -103,7 +103,8 @@ export default function Home() {
     );
   };
 
-  const translation = getCurrentTranslation();
+  // Wait for translation to be available after processing
+  const translation = processMutation.isPending ? null : getCurrentTranslation();
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
@@ -123,7 +124,8 @@ export default function Home() {
         ) : (
           <ResultsSection
             originalText={documentQuery.data?.document.originalText || "Loading original text..."}
-            translatedText={translation?.translatedText || "Loading translation..."}
+            translatedText={translation?.translatedText || 
+              (processMutation.isPending ? "Translating..." : "Translation not found. Please try again.")}
             translatedLanguage={processingDetails?.language || "hi"}
             summary={documentQuery.data?.summary?.summary}
             onNewUpload={handleNewUpload}

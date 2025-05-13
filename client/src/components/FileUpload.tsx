@@ -11,7 +11,7 @@ import { formatFileSize } from '@/lib/api';
 import { LanguageCode } from '@shared/schema';
 
 interface FileUploadProps {
-  onProcessComplete: (documentId: number, language: string, summarize: boolean) => void;
+  onProcessComplete: (documentId: number, language: any, summarize: boolean) => void;
 }
 
 export default function FileUpload({ onProcessComplete }: FileUploadProps) {
