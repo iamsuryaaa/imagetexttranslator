@@ -1,10 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, FileText, Languages, BookOpen, Save, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useFileUpload } from '@/hooks/useFileUpload';
@@ -33,8 +32,9 @@ export default function FileUpload({ onProcessComplete }: FileUploadProps) {
   } = useFileUpload();
 
   const [targetLanguage, setTargetLanguage] = useState<LanguageCode>('hi');
-  const [summarize, setSummarize] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [autoRunAll, setAutoRunAll] = useState(true);
 
   // Handle drag and drop
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -78,6 +78,7 @@ export default function FileUpload({ onProcessComplete }: FileUploadProps) {
   // Remove selected file
   const handleRemoveFile = () => {
     resetUpload();
+    setCurrentStep(1);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -106,7 +107,7 @@ export default function FileUpload({ onProcessComplete }: FileUploadProps) {
       }
 
       // File is uploaded, now call onProcessComplete with document ID
-      onProcessComplete(result.document.id, targetLanguage, summarize);
+      onProcessComplete(result.document.id, targetLanguage, true); // Always summarize
     } catch (error) {
       toast({
         title: "Processing failed",
@@ -118,156 +119,261 @@ export default function FileUpload({ onProcessComplete }: FileUploadProps) {
     }
   };
 
+  // Step content
+  const renderStepContent = () => {
+    switch(currentStep) {
+      case 1:
+        return (
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white mr-3">
+                <FileText className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-medium">Step 1: Extract Text</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              Upload an image or document file. Our system will extract all text content.
+            </p>
+            
+            {/* File Upload Area */}
+            <div
+              ref={uploadAreaRef}
+              className={`upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 ${!file ? '' : 'hidden'}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={handleUploadAreaClick}
+            >
+              <div className="mb-4">
+                <Upload className="h-10 w-10 text-gray-400 mx-auto" />
+              </div>
+              <p className="text-gray-600 mb-2">
+                Drag and drop your file here or <span className="text-primary font-medium">browse</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Supports: JPG, PNG, PDF, DOCX, TXT (Max: 10MB)
+              </p>
+              
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".jpg,.jpeg,.png,.pdf,.docx,.txt"
+                onChange={handleFileInputChange}
+              />
+            </div>
+            
+            {/* File Preview */}
+            {file && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-start space-x-4">
+                  {/* Preview icon or thumbnail */}
+                  <div className="flex-shrink-0">
+                    {filePreview ? (
+                      <img
+                        src={filePreview}
+                        alt="File preview"
+                        className="h-16 w-16 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
+                        <span className="text-gray-500 text-xs">
+                          {file.name.split('.').pop()?.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{file.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatFileSize(file.size)} • {file.type.split('/')[0].charAt(0).toUpperCase() + file.type.split('/')[0].slice(1)}
+                    </p>
+                    
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <Progress value={uploadProgress} className="mt-2 h-2" />
+                    )}
+                    
+                    {uploadError && (
+                      <p className="text-sm text-red-500 mt-1">{uploadError}</p>
+                    )}
+                  </div>
+                  
+                  <div className="flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleRemoveFile}
+                      disabled={isUploading || isProcessing}
+                      aria-label="Remove file"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      
+      case 2:
+        return (
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white mr-3">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-medium">Step 2: Summarize Content</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              We'll generate a concise summary of the extracted text, highlighting key points.
+            </p>
+          </div>
+        );
+      
+      case 3:
+        return (
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white mr-3">
+                <Languages className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-medium">Step 3: Translate & Speak</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              The summary will be translated to your chosen language and read aloud with text-to-speech.
+            </p>
+            
+            <div className="mt-4">
+              <Label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-2">
+                Choose Target Language
+              </Label>
+              <Select
+                value={targetLanguage}
+                onValueChange={(value) => setTargetLanguage(value as LanguageCode)}
+                disabled={isUploading || isProcessing}
+              >
+                <SelectTrigger id="language" className="w-full">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hi">Hindi (हिन्दी)</SelectItem>
+                  <SelectItem value="bn">Bengali (বাংলা)</SelectItem>
+                  <SelectItem value="ta">Tamil (தமிழ்)</SelectItem>
+                  <SelectItem value="te">Telugu (తెలుగు)</SelectItem>
+                  <SelectItem value="mr">Marathi (मराठी)</SelectItem>
+                  <SelectItem value="kn">Kannada (ಕನ್ನಡ)</SelectItem>
+                  <SelectItem value="gu">Gujarati (ગુજરાતી)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        );
+      
+      case 4:
+        return (
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white mr-3">
+                <Save className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-medium">Step 4: Save Results</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              All your processed data is automatically saved to the database for future reference.
+            </p>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  // Next step button handler
+  const handleNextStep = () => {
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    } else if (currentStep === 4) {
+      handleProcessFile();
+    }
+  };
+
+  // Process all steps handler
+  const handleProcessAll = () => {
+    handleProcessFile();
+  };
+
+  // Determine if next step button should be disabled
+  const isNextDisabled = () => {
+    if (currentStep === 1 && !file) return true;
+    return isUploading || isProcessing;
+  };
+
   return (
     <Card className="bg-white rounded-xl shadow-md mb-8">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-gray-800">Upload Your File</CardTitle>
+        <CardTitle className="text-xl font-semibold text-gray-800">Document Processing Wizard</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* File Upload Area */}
-        <div
-          ref={uploadAreaRef}
-          className={`upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 ${!file ? '' : 'hidden'}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={handleUploadAreaClick}
-        >
-          <div className="mb-4">
-            <Upload className="h-10 w-10 text-gray-400 mx-auto" />
-          </div>
-          <p className="text-gray-600 mb-2">
-            Drag and drop your file here or <span className="text-primary font-medium">browse</span>
-          </p>
-          <p className="text-sm text-gray-500">
-            Supports: JPG, PNG, PDF, DOCX, TXT (Max: 10MB)
-          </p>
-          
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept=".jpg,.jpeg,.png,.pdf,.docx,.txt"
-            onChange={handleFileInputChange}
-          />
-        </div>
-        
-        {/* File Preview */}
-        {file && (
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-start space-x-4">
-              {/* Preview icon or thumbnail */}
-              <div className="flex-shrink-0">
-                {filePreview ? (
-                  <img
-                    src={filePreview}
-                    alt="File preview"
-                    className="h-16 w-16 object-cover rounded"
-                  />
-                ) : (
-                  <div className="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
-                    <span className="text-gray-500 text-xs">
-                      {file.name.split('.').pop()?.toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{file.name}</p>
-                <p className="text-sm text-gray-500">
-                  {formatFileSize(file.size)} • {file.type.split('/')[0].charAt(0).toUpperCase() + file.type.split('/')[0].slice(1)}
-                </p>
-                
-                {uploadProgress > 0 && uploadProgress < 100 && (
-                  <Progress value={uploadProgress} className="mt-2 h-2" />
-                )}
-                
-                {uploadError && (
-                  <p className="text-sm text-red-500 mt-1">{uploadError}</p>
-                )}
-              </div>
-              
-              <div className="flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRemoveFile}
-                  disabled={isUploading || isProcessing}
-                  aria-label="Remove file"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Processing Options */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Language Selector */}
-          <div>
-            <Label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-2">
-              Translate to Language
-            </Label>
-            <Select
-              value={targetLanguage}
-              onValueChange={(value) => setTargetLanguage(value as LanguageCode)}
-              disabled={isUploading || isProcessing}
+        {/* Progress steps */}
+        <div className="flex mb-8 justify-between">
+          {[1, 2, 3, 4].map(step => (
+            <div 
+              key={step} 
+              className={`relative flex flex-col items-center ${step <= currentStep ? 'text-primary' : 'text-gray-400'}`}
             >
-              <SelectTrigger id="language" className="w-full">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hi">Hindi (हिन्दी)</SelectItem>
-                <SelectItem value="bn">Bengali (বাংলা)</SelectItem>
-                <SelectItem value="ta">Tamil (தமிழ்)</SelectItem>
-                <SelectItem value="te">Telugu (తెలుగు)</SelectItem>
-                <SelectItem value="mr">Marathi (मराठी)</SelectItem>
-                <SelectItem value="kn">Kannada (ಕನ್ನಡ)</SelectItem>
-                <SelectItem value="gu">Gujarati (ગુજરાતી)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Summarize Toggle */}
-          <div>
-            <Label htmlFor="summarize" className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Options
-            </Label>
-            <div className="flex items-center">
-              <Checkbox
-                id="summarize"
-                checked={summarize}
-                onCheckedChange={(checked) => setSummarize(checked === true)}
-                disabled={isUploading || isProcessing}
-              />
-              <label htmlFor="summarize" className="ml-2 block text-sm text-gray-700">
-                Summarize text content
-              </label>
+              <div className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${step <= currentStep ? 'border-primary bg-primary-50' : 'border-gray-300'} mb-1`}>
+                {step}
+              </div>
+              <div className="text-xs font-medium">
+                {step === 1 && "Extract"}
+                {step === 2 && "Summarize"}
+                {step === 3 && "Translate"}
+                {step === 4 && "Save"}
+              </div>
+              {step < 4 && (
+                <div className={`absolute top-4 left-full w-[calc(100%-2rem)] h-0.5 -z-10 ${step < currentStep ? 'bg-primary' : 'bg-gray-300'}`} style={{width: 'calc(100% - 2rem)', transform: 'translateX(-50%)'}}></div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
         
-        {/* Processing Button */}
-        <div className="mt-6">
-          {!isUploading && !isProcessing ? (
+        {/* Current step content */}
+        {renderStepContent()}
+        
+        {/* Action buttons */}
+        <div className="mt-6 flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+            disabled={currentStep === 1 || isUploading || isProcessing}
+          >
+            Previous Step
+          </Button>
+          
+          <div className="flex gap-3">
             <Button
-              onClick={handleProcessFile}
+              variant="default"
+              onClick={handleProcessAll}
               disabled={!file || isUploading || isProcessing}
-              className="w-full sm:w-auto"
+              className="flex items-center gap-2"
             >
-              Process File
+              {isUploading || isProcessing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : null}
+              Process All Steps
             </Button>
-          ) : (
+            
             <Button
-              disabled
-              className="w-full sm:w-auto bg-primary-100 text-primary-700"
+              onClick={handleNextStep}
+              disabled={isNextDisabled()}
+              className="flex items-center gap-1"
             >
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isUploading ? 'Uploading...' : 'Processing...'}
+              {currentStep === 4 ? 'Start Processing' : 'Next Step'}
+              <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
-          )}
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle2, Copy, Download } from 'lucide-react';
+import { 
+  CheckCircle2, Copy, Download, FileText, 
+  BookOpen, Languages, Save 
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageDisplayName } from '@/lib/api';
@@ -89,9 +92,56 @@ export default function ResultsSection({
   return (
     <Card className="bg-white rounded-xl shadow-md mb-8">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-gray-800">Results</CardTitle>
+        <CardTitle className="text-xl font-semibold text-gray-800">Your Processed Results</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* Steps process indicators */}
+        <div className="flex mb-8 justify-between">
+          <div className="flex flex-col items-center">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div className="text-sm font-medium text-gray-600">Text Extracted</div>
+          </div>
+          
+          <div className="flex-1 mx-2 flex items-center">
+            <div className="h-0.5 w-full bg-green-500"></div>
+          </div>
+          
+          {summary ? (
+            <>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div className="text-sm font-medium text-gray-600">Summarized</div>
+              </div>
+
+              <div className="flex-1 mx-2 flex items-center">
+                <div className="h-0.5 w-full bg-green-500"></div>
+              </div>
+            </>
+          ) : null}
+          
+          <div className="flex flex-col items-center">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+              <Languages className="h-5 w-5" />
+            </div>
+            <div className="text-sm font-medium text-gray-600">Translated</div>
+          </div>
+          
+          <div className="flex-1 mx-2 flex items-center">
+            <div className="h-0.5 w-full bg-green-500"></div>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+              <Save className="h-5 w-5" />
+            </div>
+            <div className="text-sm font-medium text-gray-600">Saved</div>
+          </div>
+        </div>
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 border-b border-gray-200 w-full justify-start">
             <TabsTrigger value="original" className="pb-4 px-1 data-[state=active]:border-primary data-[state=active]:text-primary">
