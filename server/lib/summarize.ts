@@ -69,7 +69,7 @@ export async function summarizeText(text: string, maxLength: number = 250): Prom
     
     // Return the original text if it's already shorter than the target length
     if (text.length <= maxLength || sentences.length <= 3) {
-      return text;
+      return "Summary: " + text;
     }
     
     // Calculate word frequency
@@ -101,17 +101,18 @@ export async function summarizeText(text: string, maxLength: number = 250): Prom
       .sort(); // Sort by original position to maintain flow
     
     // Construct the summary
-    const summary = topIndexes.map(index => sentences[index]).join(' ');
+    const summaryText = topIndexes.map(index => sentences[index]).join(' ');
     
-    return summary;
+    // Add a title prefix to make it clear this is a summary
+    return "Key Points Summary:\n\n" + summaryText;
   } catch (error) {
     console.error('Error summarizing text:', error);
     // In case of error, return a subset of the original text
     const words = text.split(/\s+/);
     if (words.length > 50) {
-      return words.slice(0, 50).join(' ') + '...';
+      return "Brief Summary:\n\n" + words.slice(0, 50).join(' ') + '...';
     }
-    return text;
+    return "Summary:\n\n" + text;
   }
 }
 
