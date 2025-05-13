@@ -1,0 +1,73 @@
+हिंदी अनुवाद:
+
+यह सबसे अच्छा था 
+समय, यह सबसे बुरा था 
+कई बार, यह उम्र थी 
+ज्ञान की, यह था 
+मूर्खता की उम्र ...
+    <div class="speech-container">
+      <button 
+        class="speech-button" 
+        onclick="speakText(this)" 
+        data-text="%E0%A4%AF%E0%A4%B9%20%E0%A4%B8%E0%A4%AC%E0%A4%B8%E0%A5%87%20%E0%A4%85%E0%A4%9A%E0%A5%8D%E0%A4%9B%E0%A4%BE%20%E0%A4%A5%E0%A4%BE%20%0A%E0%A4%B8%E0%A4%AE%E0%A4%AF%2C%20%E0%A4%AF%E0%A4%B9%20%E0%A4%B8%E0%A4%AC%E0%A4%B8%E0%A5%87%20%E0%A4%AC%E0%A5%81%E0%A4%B0%E0%A4%BE%20%E0%A4%A5%E0%A4%BE%20%0A%E0%A4%95%E0%A4%88%20%E0%A4%AC%E0%A4%BE%E0%A4%B0%2C%20%E0%A4%AF%E0%A4%B9%20%E0%A4%89%E0%A4%AE%E0%A5%8D%E0%A4%B0%20%E0%A4%A5%E0%A5%80%20%0A%E0%A4%9C%E0%A5%8D%E0%A4%9E%E0%A4%BE%E0%A4%A8%20%E0%A4%95%E0%A5%80%2C%20%E0%A4%AF%E0%A4%B9%20%E0%A4%A5%E0%A4%BE%20%0A%E0%A4%AE%E0%A5%82%E0%A4%B0%E0%A5%8D%E0%A4%96%E0%A4%A4%E0%A4%BE%20%E0%A4%95%E0%A5%80%20%E0%A4%89%E0%A4%AE%E0%A5%8D%E0%A4%B0%20..." 
+        data-lang="hi-IN"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+          <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+          <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+        </svg>
+        Listen
+      </button>
+    </div>
+    <script>
+      function speakText(button) {
+        const text = decodeURIComponent(button.getAttribute('data-text'));
+        const lang = button.getAttribute('data-lang');
+        
+        // Stop any currently speaking synthesis
+        window.speechSynthesis.cancel();
+        
+        // Create a new utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        
+        // Set button state to playing
+        button.classList.add('speaking');
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg> Playing...';
+        
+        // Reset button when speech ends
+        utterance.onend = () => {
+          button.classList.remove('speaking');
+          button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/></svg> Listen';
+        };
+        
+        // Play the speech
+        window.speechSynthesis.speak(utterance);
+      }
+    </script>
+    <style>
+      .speech-container {
+        margin-top: 15px;
+      }
+      .speech-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        background-color: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .speech-button:hover {
+        background-color: #e5e7eb;
+      }
+      .speech-button.speaking {
+        background-color: #e5e7eb;
+        color: #4f46e5;
+      }
+    </style>

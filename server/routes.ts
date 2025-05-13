@@ -103,19 +103,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           processRequest.targetLanguage as LanguageCode
         );
         
-        // Generate speech markup for text-to-speech functionality
-        const speechMarkup = generateSpeechMarkup(
-          translatedText,
-          processRequest.targetLanguage as LanguageCode
-        );
-        
-        // Combine translated text with speech functionality
-        const translatedTextWithSpeech = translatedText + speechMarkup;
-        
+        // Store just the translated text without any HTML
         translation = await storage.createTranslation({
           documentId,
           language: processRequest.targetLanguage,
-          translatedText: translatedTextWithSpeech,
+          translatedText: translatedText,
         });
       }
 
