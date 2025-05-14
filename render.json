@@ -1,0 +1,15 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "user-friendly-portal",
+      "env": "node",
+      "buildCommand": "npm run build",
+      "startCommand": "npm start",
+      "envVars": {
+        "NODE_ENV": "production"
+      },
+      "httpPort": 5000
+    }
+  ]
+}
